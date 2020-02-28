@@ -13,12 +13,12 @@
             padding: 3px;
             margin: 1px;
             color: white;
+            width: 500px;
         }
     </style>
 </head>
 
 <body>
-    <p>TESST!!!</p>
     <div class="chart"></div>
 
 
@@ -28,20 +28,33 @@
 
         var data = [30, 86, 168, 281, 303, 365];
         let result;
-        
+
         async function getData() {
             result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) { return data });
-            console.log(result[0]);
+
+            for (let index = 0; index < 10; index++) {
+                console.log(result[index].population_2014);
+            }
+
+            resultSortByPopulationDescending = result.sort(function (a, b) { return b.population_2014 - a.population_2014 });
+
+            var first10Elements = [];
+            for (let index = 0; index < 10; index++) {
+                first10Elements.push({
+                    "Population en 2014" : resultSortByPopulationDescending[index].population_2014,
+                    "Commune" : resultSortByPopulationDescending[index].commune
+                });
+            }
+
+            d3.select(".chart")
+                .selectAll("div")
+                .data(first10Elements)
+                .enter()
+                .append("div")
+                .style("width", function (d) { return d + "px"; })
+                .text(function (d) { return d; });
         }
         getData();
-
-        d3.select(".chart")
-            .selectAll("div")
-            .data(data)
-            .enter()
-            .append("div")
-            .style("width", function (d) { return d + "px"; })
-            .text(function (d) { return d; });
     </script>
 </body>
 
