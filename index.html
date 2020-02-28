@@ -27,18 +27,16 @@
         d3.select("body").transition().style("background-color", "#333");
 
         var data = [30, 86, 168, 281, 303, 365];
-
-        console.log(d3)
-        d3.csv("TDV-hackaviz_2018.geojson", function (data) {
-            console.log(data)
-        });
-        // NOT WORK
-        d3.geojson("TDV-hackaviz_2018.geojson", function (data) {
-            console.log(data)
-        });
+        let result;
+        
+        async function getData() {
+            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) { return data });
+            console.log(result[0]);
+        }
+        getData();
 
         d3.select(".chart")
-            .selectAll("div")   
+            .selectAll("div")
             .data(data)
             .enter()
             .append("div")
