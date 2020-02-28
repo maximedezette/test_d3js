@@ -24,24 +24,47 @@
 
     <script src="d3.v5.min.js"></script>
     <script>
+
+        var format_data = [];
+
+
         d3.select("body").transition().style("background-color", "#333");
 
         var data = [30, 86, 168, 281, 303, 365];
         let result;
-        
-        async function getData() {
-            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) { return data });
-            console.log(result[0]);
-        }
-        getData();
 
-        d3.select(".chart")
+        async function getData() {
+            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) {
+                return data
+            });
+
+            console.log(result[0]['population_2014']);
+            result.forEach(function (d) {
+                format_data.push(parseInt(d['population_2014']));
+            });
+            console.log(format_data);
+
+            
+
+            d3.select(".chart")
             .selectAll("div")
-            .data(data)
+            .data(format_data)
             .enter()
             .append("div")
-            .style("width", function (d) { return d + "px"; })
-            .text(function (d) { return d; });
+            .style("width", function (d) {
+                return d + "px";
+            })
+            .text(function (d) {
+                return d;
+            });
+        }
+
+
+        getData();
+
+
+
+
     </script>
 </body>
 
