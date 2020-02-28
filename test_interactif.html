@@ -110,8 +110,14 @@
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
+                        if( format_data[d.properties.NOM_DEPT] === undefined){
+                            superficie = 'non-renseignée';
+                        }else{
+                            superficie = format_data[d.properties.NOM_DEPT] + ' km²';
+                        }
+
                         div.html("Département : " + d.properties.NOM_DEPT + "<br/>" +
-                            "Région : " + d.properties.NOM_REGION)
+                            "Superficie : " + superficie)
                             .style("left", (d3.event.pageX + 30) + "px")
                             .style("top", (d3.event.pageY - 30) + "px")
                     })
