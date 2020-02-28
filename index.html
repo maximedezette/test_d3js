@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -24,6 +24,10 @@
 
     <script src="d3.v5.min.js"></script>
     <script>
+
+        var format_data = [];
+
+
         d3.select("body").transition().style("background-color", "#333");
 
         var data = [30, 86, 168, 281, 303, 365];
@@ -45,16 +49,37 @@
                     "Commune" : resultSortByPopulationDescending[index].commune
                 });
             }
+            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) {
+                return data
+            });
+
+            console.log(result[0]['population_2014']);
+            result.forEach(function (d) {
+                format_data.push(parseInt(d['population_2014']));
+            });
+            console.log(format_data);
+
+            
 
             d3.select(".chart")
-                .selectAll("div")
-                .data(first10Elements)
-                .enter()
-                .append("div")
-                .style("width", function (d) { return d + "px"; })
-                .text(function (d) { return d; });
+            .selectAll("div")
+            .data(format_data)
+            .enter()
+            .append("div")
+            .style("width", function (d) {
+                return d + "px";
+            })
+            .text(function (d) {
+                return d;
+            });
         }
+
+
         getData();
+
+
+
+
     </script>
 </body>
 
