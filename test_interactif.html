@@ -40,7 +40,23 @@
 
     <script src="d3.v5.min.js"></script>
     <script>
-        function afficherMap() {
+        var format_data = [];
+
+        var data = [30, 86, 168, 281, 303, 365];
+        let result;
+
+        function getSuperficie(nomDpt) {
+            var superficie = 0;
+
+            format_data.forEach(function (element, index) {
+                if (nomDpt.trim() == element.trim()) {
+                    superficie = superficie + index;
+                }
+            });
+            return superficie;
+        }
+
+        async function getData() {
             const width = 550,
                 height = 550;
             const path = d3.geoPath();
@@ -59,33 +75,31 @@
 
             const deps = svg.append("g");
 
-
-            d3.json('departments.json').then(function (geojson) {
-                deps.selectAll("path")
-                    .data(geojson.features)
-                    .enter()
-                    .append("path")
-                    .attr("d", path);
-            });
-
             var div = d3.select("body").append("div")
                 .attr("class", "tooltip")
                 .style("opacity", 0);
 
+            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) { return data });
+            result.forEach(function (d) {
+                if(format_data[d['nom_dept']] == null){
+                format_data.push(d['nom_dept']);
+                format_data[d['nom_dept']] = 0;
 
+                }
+       
+            });
 
-            d3.json('departments.json').then(function (geojson) {
-                console.log(geojson.features);
+            result.forEach(function (d) {
+            if (format_data[d['nom_dept']] !== null) {
+                    format_data[d['nom_dept']] = +format_data[d['nom_dept']] + (+d['superficie']);
+                }
+                else {
+                    format_data[d['nom_dept']] = parseInt(d['superficie']);
+                }
+            });
+            console.log(format_data);
 
-
-                /*   format_data.forEach(getSuperficie);
-
-                   function getSuperficie(item, index) {
-                       
-                       console.log(index);
-                       console.log(item);
-                   }*/
-
+            await d3.json('departments.json').then(function (geojson) {
                 deps.selectAll("path")
                     .data(geojson.features)
                     .enter()
@@ -93,68 +107,22 @@
                     .attr('class', 'department')
                     .attr("d", path)
                     .on("mouseover", function (d) {
-                        console.log('mouse over!');
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
-                        //afficherSuperficie(d.properties.NOM_DEPT);
                         div.html("Département : " + d.properties.NOM_DEPT + "<br/>" +
-                                "Région : " + d.properties.NOM_REGION)
+                            "Région : " + d.properties.NOM_REGION)
                             .style("left", (d3.event.pageX + 30) + "px")
                             .style("top", (d3.event.pageY - 30) + "px")
                     })
-
-
-
-
-
                     .on("mouseout", function (d) {
-                        console.log('mouse out!');
                         div.style("opacity", 0);
                         div.html("")
                             .style("left", "-500px")
                             .style("top", "-500px");
                     });
             });
-
         }
-        var format_data = [];
-
-
-
-
-        var data = [30, 86, 168, 281, 303, 365];
-        let result;
-
-        async function getData() {
-            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) {
-                return data
-            });
-
-            //console.log(result[0]['population_2014']);
-            result.forEach(function (d) {
-                format_data.push(d['nom_dept']);
-                format_data[d['nom_dept']] = parseInt(d['superficie']);
-            });
-
-            afficherMap();
-            alert('done!');
-            //console.log(format_data);
-
-        }
-
-
-        function afficherSuperficie(nomDpt) {
-           /* var superficie = 0;
-            format_data.forEach(function (element, index) {
-                if (nomDpt === element) {
-                    superficie = superficie + index;
-                }
-            });
-
-            alert(superficie);*/
-        }
-
 
         getData();
     </script>
