@@ -5,28 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        .chart div {
-            font: 10px sans-serif;
-            background-color: steelblue;
-            text-align: right;
-            padding: 3px;
-            margin: 1px;
-            color: white;
-            width: 500px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+
+    <h1 class="text-4xl text-center">EPSI I2 - Groupe 1 : Maxime DEZETTE & Jean-Baptiste MATHIEU</h1>
+    <h4>Nombre de votant par commune</h4>
+    <p>Placer le curseur de votre souris au-dessus de chaque département pour voir le nombre de votant et le nom de la commune</p>
+
     <div class="chart"></div>
 
 
     <script src="d3.v5.min.js"></script>
     <script>
-
         var format_data = [];
-
 
         d3.select("body").transition().style("background-color", "#333");
 
@@ -45,8 +38,8 @@
             var first10Elements = [];
             for (let index = 0; index < 10; index++) {
                 first10Elements.push({
-                    "Population en 2014" : resultSortByPopulationDescending[index].population_2014,
-                    "Commune" : resultSortByPopulationDescending[index].commune
+                    "Population en 2014": resultSortByPopulationDescending[index].population_2014,
+                    "Commune": resultSortByPopulationDescending[index].commune
                 });
             }
             result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) {
@@ -58,27 +51,23 @@
                 format_data.push(parseInt(d['population_2014']));
             });
             console.log(format_data);
-
-            
+            // format_data = format_data.sort(function (a, b) { return b - a });
 
             d3.select(".chart")
-            .selectAll("div")
-            .data(format_data)
-            .enter()
-            .append("div")
-            .style("width", function (d) {
-                return d + "px";
-            })
-            .text(function (d) {
-                return d;
-            });
+                .selectAll("div")
+                .data(format_data)
+                .enter()
+                .append("div")
+                .style("width", function (d) {
+                    return d + "px";
+                })
+                .text(function (d) {
+                    return d;
+                });
+            d3.select(".chart")
+                .selectAll("div").transition().style("background-color", "steelblue");
         }
-
-
         getData();
-
-
-
 
     </script>
 </body>
