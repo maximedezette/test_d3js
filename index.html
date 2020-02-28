@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <h1 class="text-4xl text-center">EPSI I2 - Groupe 1 : Maxime DEZETTE & Jean-Baptiste MATHIEU</h1>
+
+    <div id="map" class="m-auto w-3/6"> </div>
+   
+    <script src="d3.v5.min.js"></script>
+    <script>
+        var format_data = [];
+
+        var data = [30, 86, 168, 281, 303, 365];
+        let result;
+
+        function getSuperficie(nomDpt) {
+            var superficie = 0;
+
+            format_data.forEach(function (element, index) {
+                if (nomDpt.trim() == element.trim()) {
+                    superficie = superficie + index;
+                }
+            });
+            return superficie;
+        }
+
+        async function getData() {
+            const width = 550,
+                height = 550;
+            const path = d3.geoPath();
+
+            const projection = d3.geoConicConformal()
+                .center([2.454071, 46.279229])
+                .scale(2600)
+                .translate([width / 2, height / 2]);
+
+            path.projection(projection);
+
+            const svg = d3.select('#map').append("svg")
+                .attr("id", "svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            const deps = svg.append("g");
+
+            var div = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) { return data });
+            result.forEach(function (d) {
+                if(format_data[d['nom_dept']] == null){
+                format_data.push(d['nom_dept']);
+                format_data[d['nom_dept']] = 0;
+
+                }
+       
+            });
+
+            result.forEach(function (d) {
+            if (format_data[d['nom_dept']] !== null) {
+                    format_data[d['nom_dept']] = +format_data[d['nom_dept']] + (+d['superficie']);
+                }
+                else {
+                    format_data[d['nom_dept']] = parseInt(d['superficie']);
+                }
+            });
+            console.log(format_data);
+
+            await d3.json('departments.json').then(function (geojson) {
+                deps.selectAll("path")
+                    .data(geojson.features)
+                    .enter()
+                    .append("path")
+                    .attr('class', 'department')
+                    .attr("d", path)
+                    .on("mouseover", function (d) {
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        if( format_data[d.properties.NOM_DEPT] === undefined){
+                            superficie = 'non-renseignée';
+                        }else{
+                            superficie = format_data[d.properties.NOM_DEPT] + ' km²';
+                        }
+
+                        div.html("Département : " + d.properties.NOM_DEPT + "<br/>" +
+                            "Superficie : " + superficie)
+                            .style("left", (d3.event.pageX + 30) + "px")
+                            .style("top", (d3.event.pageY - 30) + "px")
+                    })
+                    .on("mouseout", function (d) {
+                        div.style("opacity", 0);
+                        div.html("")
+                            .style("left", "-500px")
+                            .style("top", "-500px");
+                    });
+            });
+        }
+
+        getData();
+    </script>
+</body>
+
+</html>
