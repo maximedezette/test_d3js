@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .chart div {
+            font: 10px sans-serif;
+            background-color: steelblue;
+            text-align: right;
+            padding: 3px;
+            margin: 1px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <p>TESST!!!</p>
+    <div class="chart"></div>
+
+
+    <script src="d3.v5.min.js"></script>
+    <script>
+        d3.select("body").transition().style("background-color", "#333");
+
+        var data = [30, 86, 168, 281, 303, 365];
+
+        console.log(d3)
+        d3.csv("TDV-hackaviz_2018.geojson", function (data) {
+            console.log(data)
+        });
+        // NOT WORK
+        d3.geojson("TDV-hackaviz_2018.geojson", function (data) {
+            console.log(data)
+        });
+
+        d3.select(".chart")
+            .selectAll("div")   
+            .data(data)
+            .enter()
+            .append("div")
+            .style("width", function (d) { return d + "px"; })
+            .text(function (d) { return d; });
+    </script>
+</body>
+
+</html>
