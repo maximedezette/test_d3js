@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .chart div {
+            font: 10px sans-serif;
+            background-color: steelblue;
+            text-align: right;
+            padding: 3px;
+            margin: 1px;
+            color: white;
+        }
+
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            color: black;
+            width: 275px;
+            height: 37px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: grey;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div id="map"> </div>
+    <div class="chart"></div>
+
+
+    <script src="d3.v5.min.js"></script>
+    <script>
+        const width = 550,
+            height = 550;
+        const path = d3.geoPath();
+
+        const projection = d3.geoConicConformal()
+            .center([2.454071, 46.279229])
+            .scale(2600)
+            .translate([width / 2, height / 2]);
+
+        path.projection(projection);
+
+        const svg = d3.select('#map').append("svg")
+            .attr("id", "svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        const deps = svg.append("g");
+
+
+        d3.json('departments.json').then(function (geojson) {
+            deps.selectAll("path")
+                .data(geojson.features)
+                .enter()
+                .append("path")
+                .attr("d", path);
+        });
+
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        
+            
+            d3.json('departments.json').then(function (geojson) {
+                console.log(geojson.features);
+
+            deps.selectAll("path")
+                .data(geojson.features)
+                .enter()
+                .append("path")
+                .attr('class', 'department')
+                .attr("d", path)
+                .on("mouseover", function (d) {
+                  
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    div.html("Département : " + d.properties.NOM_DEPT + "<br/>" +
+                            "Région : " + d.properties.NOM_REGION)
+                        .style("left", (d3.event.pageX + 30) + "px")
+                        .style("top", (d3.event.pageY - 30) + "px")
+                })
+                .on("mouseout", function (d) {
+                    div.style("opacity", 0);
+                    div.html("")
+                        .style("left", "-500px")
+                        .style("top", "-500px");
+                });
+        });
+
+        var format_data = [];
+
+
+
+
+        var data = [30, 86, 168, 281, 303, 365];
+        let result;
+
+        async function getData() {
+            result = await d3.dsv(";", "TDV_hackaviz_2018.csv").then(function (data) {
+                return data
+            });
+
+            console.log(result[0]['population_2014']);
+            result.forEach(function (d) {
+                format_data.push(parseInt(d['population_2014']));
+            });
+       
+        }
+
+
+        getData();
+    </script>
+</body>
+
+</html>
